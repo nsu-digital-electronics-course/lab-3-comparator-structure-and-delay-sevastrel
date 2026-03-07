@@ -1,26 +1,28 @@
 `timescale 1ns / 1ps
 
-module comp(
-    input [31:0] a,
-    input [31:0] b,
+module comp #(
+    parameter int size = 32  // Параметр с значением по умолчанию
+) (
+    input [size-1:0] a,
+    input [size-1:0] b,
     output logic gt,
     output logic eq,
     output logic lt
     );
-
-    logic [31:0] bit_eq;
     
-    logic [32:0] eq_chain;
+    logic [size-1:0] bit_eq;
     
-    logic [31:0] gt_terms;
+    logic [size:0] eq_chain;
     
-    logic [31:0] lt_terms;
+    logic [size-1:0] gt_terms;
     
-    assign eq_chain[32] =1'b1;
+    logic [size-1:0] lt_terms;
+    
+    assign eq_chain[size] =1'b1;
     
     genvar i;
     generate 
-        for (i=0; i<32; i++) begin : bit_compare
+        for (i=0; i<size; i++) begin : bit_compare
             assign bit_eq[i] = ~(a[i] ^ b[i]);
             assign eq_chain[i] = eq_chain[i+1] & bit_eq[i];
             assign gt_terms[i] = eq_chain[i+1] & a[i] & ~b[i];
@@ -35,6 +37,6 @@ module comp(
     assign lt = |lt_terms; 
     
 // TODO
-// Âîò òóò îïèñûâàåì ñâîé êîìïàðàòîð  
+// Вот тут описываем свой компаратор  
     
 endmodule
